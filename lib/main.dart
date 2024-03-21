@@ -1,12 +1,20 @@
+import 'dart:convert';
+
 import 'package:expense_planner/models/transaction.dart';
 import 'package:expense_planner/widgets/chart.dart';
 import 'package:expense_planner/widgets/new_transaction.dart';
 import 'package:expense_planner/widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-
-
-void main() => runApp(MyApp());
+void main() {
+  /* WidgetsFlutterBinding.ensureInitialized();  // pour forcer lapp tekhdem ken all portrait mode
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);*/
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -55,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addNewTransaction(String title, double amount,DateTime chosenDate) {
+  void _addNewTransaction(String title, double amount, DateTime chosenDate) {
     final newTx = Transaction(
         title: title,
         amount: amount,
@@ -67,12 +75,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _deleteTransaction(String id){
-      setState(() {
-        _userTransactions.removeWhere((tx) {
-          return tx.id==id;
-        });
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((tx) {
+        return tx.id == id;
       });
+    });
   }
 
   void _startAddNewTransaction(BuildContext ctx) {
@@ -87,26 +95,76 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
+  bool _showChart = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Personal Expenses',
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => _startAddNewTransaction(context),
-            icon: Icon(Icons.add),
-            color: Colors.blue,
-          )
-        ],
+    final mediaQuery= MediaQuery.of(context);
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final appBar = AppBar(
+      title: Text(
+        'Personal Expenses',
       ),
+      actions: [
+        IconButton(
+          onPressed: () => _startAddNewTransaction(context),
+          icon: Icon(Icons.add),
+          color: Colors.blue,
+        )
+      ],
+    );
+
+    final txListWidget = Container(
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery
+                    .padding
+                    .top) * //MediaQuery.of(context).padding.top na7ina biha l espace zeyed
+            0.7,
+        child: TransactionList(_userTransactions, _deleteTransaction));
+    return Scaffold(
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Chart(_recentTransactions),
-            TransactionList(_userTransactions,_deleteTransaction),
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Show Chart "),
+                  Switch(
+                      value: _showChart,
+                      onChanged: (val) {
+                        setState(() {
+                          _showChart = val;
+                        });
+                      })
+                ],
+              ),
+            if (!isLandscape)
+              Container(
+                  // hne gotlo if showChart==true yaffihci chart sinon le
+                  height: (mediaQuery.size.height -
+                          appBar.preferredSize.height -
+                          mediaQuery
+                              .padding
+                              .top) * //preferredSize.height nekho biha l height ta3 l app bar
+                      0.3,
+                  child: Chart(_recentTransactions)),
+            if (!isLandscape) txListWidget,
+            if (isLandscape)
+              _showChart
+                  ? Container(
+                      // hne gotlo if showChart==true yaffihci chart sinon le
+                      height: (mediaQuery.size.height -
+                              appBar.preferredSize.height -
+                              mediaQuery
+                                  .padding
+                                  .top) * //preferredSize.height nekho biha l height ta3 l app bar
+                          0.7,
+                      child: Chart(_recentTransactions))
+                  : txListWidget
           ],
         ),
       ),
