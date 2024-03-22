@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'package:expense_planner/widgets/adaptive_button.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -64,7 +68,7 @@ class _NewTransactionState extends State<NewTransaction> {
               bottom: MediaQuery.of(context).viewInsets.bottom + 10), //hne gotlo tekho l bottom w tzido 10
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
+            children: [   
               TextField(
                 decoration: InputDecoration(labelText: 'Title'),
                 /*onChanged: (val) {
@@ -91,13 +95,7 @@ class _NewTransactionState extends State<NewTransaction> {
                           ? 'No Date Chosen !'
                           : 'Picked Date : ${DateFormat.yMd().format(_selectedDate)}'),
                     ),
-                    MaterialButton(
-                        onPressed: _presentDatePicker,
-                        child: const Text(
-                          'Choose Date',
-                          style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold),
-                        )),
+                    AdaptiveFlatButton(text:'Choose Date',handler:_presentDatePicker)
                   ],
                 ),
               ),
