@@ -21,7 +21,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       title: 'Personal Expenses',
       theme: ThemeData(
         primarySwatch: Colors.purple,
@@ -99,6 +99,53 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _showChart = false;
 
+  List<Widget> _buildLandscapeContent(
+      MediaQueryData mediaQuery, AppBar appBar, Widget txListWidget) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Show Chart ",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          Switch.adaptive(
+              value: _showChart,
+              onChanged: (val) {
+                setState(() {
+                  _showChart = val;
+                });
+              })
+        ],
+      ),
+      _showChart
+          ? Container(
+              // hne gotlo if showChart==true yaffihci chart sinon le
+              height: (mediaQuery.size.height -
+                      appBar.preferredSize.height -
+                      mediaQuery.padding
+                          .top) * //preferredSize.height nekho biha l height ta3 l app bar
+                  0.7,
+              child: Chart(_recentTransactions))
+          : txListWidget
+    ];
+  }
+
+  List<Widget> _buildPrtraitContent(
+      MediaQueryData mediaQuery, AppBar appBar, Widget txListWidget) {
+    return [
+      Container(
+          // hne gotlo if showChart==true yaffihci chart sinon le
+          height: (mediaQuery.size.height -
+                  appBar.preferredSize.height -
+                  mediaQuery.padding
+                      .top) * //preferredSize.height nekho biha l height ta3 l app bar
+              0.3,
+          child: Chart(_recentTransactions)),
+      txListWidget
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     print('build() my home page state');
@@ -106,7 +153,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    
     //user cupertino for the appBar
     /*final PreferredSizeWidget appBar = Platform.isIOS
         ? CupertinoNavigationBar(
@@ -136,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           );*/
 
-          final appBar = AppBar(
+    final appBar = AppBar(
       title: Text(
         'Personal Expenses',
       ),
@@ -157,53 +203,22 @@ class _MyHomePageState extends State<MyHomePage> {
             0.7,
         child: TransactionList(_userTransactions, _deleteTransaction));
 
-    final pageBody = SafeArea(child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          if (isLandscape)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                 Text("Show Chart ",
-                style: Theme.of(context).textTheme.titleLarge,),
-                Switch.adaptive(
-                    value: _showChart,
-                    onChanged: (val) {
-                      setState(() {
-                        _showChart = val;
-                      });
-                    })
-              ],
-            ),
-          if (!isLandscape)
-            Container(
-                // hne gotlo if showChart==true yaffihci chart sinon le
-                height: (mediaQuery.size.height -
-                        appBar.preferredSize.height -
-                        mediaQuery.padding
-                            .top) * //preferredSize.height nekho biha l height ta3 l app bar
-                    0.3,
-                child: Chart(_recentTransactions)),
-          if (!isLandscape) txListWidget,
-          if (isLandscape)
-            _showChart
-                ? Container(
-                    // hne gotlo if showChart==true yaffihci chart sinon le
-                    height: (mediaQuery.size.height -
-                            appBar.preferredSize.height -
-                            mediaQuery.padding
-                                .top) * //preferredSize.height nekho biha l height ta3 l app bar
-                        0.7,
-                    child: Chart(_recentTransactions))
-                : txListWidget
-        ],
+    final pageBody = SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (isLandscape)
+              ..._buildLandscapeContent(mediaQuery, appBar, txListWidget),
+            if (!isLandscape)
+              ..._buildPrtraitContent(mediaQuery, appBar, txListWidget),
+          ],
+        ),
       ),
-    ),
     );
 
 //user Cupertino for appBar
-   /* return Platform.isIOS
+    /* return Platform.isIOS
         ? CupertinoPageScaffold(
             child: pageBody,
             navigationBar: appBar,
@@ -223,19 +238,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
           );*/
     return Scaffold(
-            appBar: appBar,
-            body: pageBody,
-            floatingActionButton: Platform
-                    .isIOS // lehna gotlo idha nesta3eml f ios meghir me nafficher l button loutaneya ta3 l add
-                ? Container()
-                : FloatingActionButton(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.blue,
-                    ),
-                    onPressed: () => _startAddNewTransaction(context),
-                  ),
-          );
-
+      appBar: appBar,
+      body: pageBody,
+      floatingActionButton: Platform
+              .isIOS // lehna gotlo idha nesta3eml f ios meghir me nafficher l button loutaneya ta3 l add
+          ? Container()
+          : FloatingActionButton(
+              child: Icon(
+                Icons.add,
+                color: Colors.blue,
+              ),
+              onPressed: () => _startAddNewTransaction(context),
+            ),
+    );
   }
 }
