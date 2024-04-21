@@ -101,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('build() my home page state');
     final mediaQuery = MediaQuery.of(context);
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
@@ -158,6 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final pageBody = SafeArea(child: SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           if (isLandscape)
             Row(
