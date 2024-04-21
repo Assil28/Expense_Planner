@@ -8,10 +8,15 @@ import 'package:intl/intl.dart';
 class NewTransaction extends StatefulWidget {
   final Function addTx;
 
-  NewTransaction(this.addTx);
+  NewTransaction(this.addTx) {
+    print('Constructor newTransaction widget');
+  }
 
   @override
-  State<NewTransaction> createState() => _NewTransactionState();
+  State<NewTransaction> createState() {
+    print('create state newTransaction widget');
+    return _NewTransactionState();
+  }
 }
 
 class _NewTransactionState extends State<NewTransaction> {
@@ -22,6 +27,31 @@ class _NewTransactionState extends State<NewTransaction> {
   final _amountInputController = TextEditingController();
 
   late DateTime _selectedDate = DateTime.now();
+
+  _NewTransactionState() {
+    print('Constructor newTransaction State');
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    print('IniteState()');
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant NewTransaction oldWidget) {
+    // TODO: implement didUpdateWidget
+    print('didUpdateWidget()');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    print('dispose()');
+    super.dispose();
+  }
 
   void submitData() {
     if (_amountInputController.text.isEmpty) {
@@ -65,10 +95,11 @@ class _NewTransactionState extends State<NewTransaction> {
               top: 10,
               left: 10,
               right: 10,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 10), //hne gotlo tekho l bottom w tzido 10
+              bottom: MediaQuery.of(context).viewInsets.bottom +
+                  10), //hne gotlo tekho l bottom w tzido 10
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [   
+            children: [
               TextField(
                 decoration: InputDecoration(labelText: 'Title'),
                 /*onChanged: (val) {
@@ -95,7 +126,8 @@ class _NewTransactionState extends State<NewTransaction> {
                           ? 'No Date Chosen !'
                           : 'Picked Date : ${DateFormat.yMd().format(_selectedDate)}'),
                     ),
-                    AdaptiveFlatButton(text:'Choose Date',handler:_presentDatePicker)
+                    AdaptiveFlatButton(
+                        text: 'Choose Date', handler: _presentDatePicker)
                   ],
                 ),
               ),
